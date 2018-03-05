@@ -7,10 +7,12 @@ You can upload this game to the chip by coping HEX file via conneted by USB micr
 
 If you want to update the program, visit https://makecode.microbit.org/# and choose Projects > Import File (hex)
 
-JavaScipt version is a represenation of visual coded algoritm in blocks via online editor: https://makecode.microbit.org/#
+JavaScipt version is a represenation of visual coded algorithm using blocks via online editor: https://makecode.microbit.org/#
 
 In editor you can also test the code by using online microbit emulator.
 
-The game should be intuitive, so have fun :)
+Read more about microbit here: https://microbit.org/guide/
+
+The game should be intuitive, so have fun :) and give me a feedback
 
 KM192
