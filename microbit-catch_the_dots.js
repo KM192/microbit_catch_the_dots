@@ -130,10 +130,10 @@ function MovetoXYCoordinates() {
         if (new_y != total_tries) {
             new_y = total_tries
             ocupiedDot = false
-            x_offset = 0
+            x_offset = 1
             while (!(ocupiedDot)) {
                 new_x = Math.random(5)
-                ocupiedDot = !(led.point(new_x, new_y))
+                ocupiedDot = !(led.point((new_x + x_offset) % 5, new_y))
             }
             direction = Math.randomBoolean()
         } else {
@@ -163,8 +163,7 @@ function MovetoXYCoordinates() {
             } else if (screen < 9) {
                 if (new_x == 0) {
                     x_offset = 1
-                }
-                if (new_x == 4) {
+                } else if (new_x == 4) {
                     x_offset = -1
                 }
             } else if (screen < 12) {
@@ -351,8 +350,8 @@ function PresentScoring() {
                 }
                 ToggleScreen()
                 basic.pause(500)
-                screen += 1
             }
+            screen += 1
         }
         else {
             if (30 - score >= 5 * (level)) {
