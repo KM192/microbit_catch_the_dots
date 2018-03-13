@@ -373,7 +373,7 @@ function PresentScoring() {
     }
     basic.pause(1000)
 }
-function Selectscreen() {
+function SelectScreen() {
     // For Testing purpose - jump to selected screen at
     // start
     if (input.buttonIsPressed(Button.AB)) {
@@ -395,7 +395,34 @@ function Selectscreen() {
             basic.pause(100)
         }
     }
-    basic.showString("L:" + screen)
+    basic.showString("S:" + screen)
+}
+// Select Level
+function SelectLevel() {
+    // Select difficulty level (1-5)
+    // default = 4
+    if (input.buttonIsPressed(Button.AB)) {
+        while (input.buttonIsPressed(Button.AB)) {
+
+        }
+        basic.showNumber(level)
+        while (!(input.buttonIsPressed(Button.AB))) {
+            if (input.buttonIsPressed(Button.B)) {
+                if (level < 5) {
+                    level += 1
+                    basic.showNumber(level)
+                }
+            }
+            if (input.buttonIsPressed(Button.A)) {
+                if (level > 1) {
+                    level += -1
+                    basic.showNumber(level)
+                }
+            }
+            basic.pause(100)
+        }
+    }
+    basic.showString("L:" + level)
 }
 // Prepare new game screen
 function PrepareGame() {
@@ -405,11 +432,14 @@ function PrepareGame() {
     score = 0
     selectedDots = [-1, -1, -1, -1, -1]
     SelectSpeed()
+    while (input.buttonIsPressed(Button.A) || input.buttonIsPressed(Button.B) || input.buttonIsPressed(Button.AB)) {
+    }
 }
 level = 4
 PrepareOnStart()
 basic.forever(() => {
-    Selectscreen()
+    SelectScreen()
+    SelectLevel()
     PrepareChallenge()
     PrepareGame()
     ExecuteGamescreen()
