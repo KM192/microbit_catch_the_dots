@@ -22,16 +22,21 @@ let i = 0
 // Running one screen of the game
 function ExecuteGamescreen() {
     while (in_game) {
-        if (!(quiet)) {
-            music.playTone(131, music.beat(BeatFraction.Sixteenth))
-        } else {
-            // 1/16 equivalent
-            basic.pause(music.beat(BeatFraction.Sixteenth))
-        }
         // Remember if there is pattern in the background
         background = led.point(new_x, new_y)
         if (background) {
             score += 1
+        }
+        if (!(quiet)) {
+            if (!(background)) {
+                music.playTone(131, music.beat(BeatFraction.Sixteenth))
+            }
+            else {
+                music.playTone(131 + 20, music.beat(BeatFraction.Sixteenth))
+            }
+        } else {
+            // 1/16 equivalent
+            basic.pause(music.beat(BeatFraction.Sixteenth))
         }
         led.plotBrightness(new_x, new_y, 255)
         curent_time = input.runningTime()
@@ -51,6 +56,7 @@ function ExecuteGamescreen() {
                 }
                 selectedDots[new_y] = new_x
                 total_tries += 1
+                speed = speed - (level - 3) * 10
                 // ChooseXDirection() This is end of the current
                 // screen. Let's check result
                 if (total_tries == 5) {
@@ -83,14 +89,14 @@ function ExecuteGamescreen() {
 // Show sad face
 function ShowSadFace() {
     led.setBrightness(255)
-    basic.clearScreen()
-    led.plot(1, 1)
-    led.plot(3, 1)
-    led.plot(1, 3)
-    led.plot(2, 3)
-    led.plot(3, 3)
-    led.plot(0, 4)
-    led.plot(4, 4)
+    //basic.clearScreen()
+    led.toggle(1, 1)
+    led.toggle(3, 1)
+    led.toggle(1, 3)
+    led.toggle(2, 3)
+    led.toggle(3, 3)
+    led.toggle(0, 4)
+    led.toggle(4, 4)
     if (!(quiet)) {
         music.playTone(147, music.beat(BeatFraction.Double))
     } else {
@@ -112,6 +118,7 @@ function CheckResult() {
     if (i == 5) {
         PresentScoring()
     } else {
+        basic.clearScreen()
         ShowSadFace()
     }
     basic.pause(1000)
@@ -229,6 +236,7 @@ function MovetoXYCoordinates() {
             new_x = Math.random(5)
             new_y = Math.random(5)
             x_offset = 0
+            y_offset = 0
             if ((new_x + x_offset) % 5 != selectedDots[(new_y + y_offset) % 5]) {
                 ocupiedDot = false
             }
@@ -323,54 +331,66 @@ function PrepareChallenge() {
 // Present status screen after screen accomplish
 function PresentScoring() {
     basic.clearScreen()
-    if (0 < 30) {
-        for (let r = 0; r <= level * 5 - 1; r++) {
-            led.plotBrightness(r % 5, 4 - r / 5, 10)
+    // plot minumum target (depending on current level)
+    for (let r = 0; r <= level * 5 - 1; r++) {
+        led.plotBrightness(r % 5, 4 - r / 5, 10)
+    }
+    basic.pause(250)
+    for (let t = 0; t <= Math.min(24, 29 - score); t++) {
+        led.plot(t % 5, 4 - t / 5)
+        if (!(quiet)) {
+            music.playTone(175 + t * 5, music.beat(BeatFraction.Sixteenth))
+        } else {
+            basic.pause(music.beat(BeatFraction.Sixteenth))
         }
-        basic.pause(250)
-        for (let t = 0; t <= Math.min(24, 29 - score); t++) {
-            led.plot(t % 5, 4 - t / 5)
+        basic.pause(200 - 8 * t)
+    }
+    basic.pause(250)
+    // Check if got top Scores
+    if (score < 6) {
+        for (let i0 = 0; i0 < 3; i0++) {
+            basic.clearScreen()
+            led.plot(1, 1)
+            led.plot(3, 1)
+            led.plot(1, 4)
+            led.plot(2, 4)
+            led.plot(3, 4)
+            led.plot(0, 3)
+            led.plot(4, 3)
             if (!(quiet)) {
-                music.playTone(175 + t * 5, music.beat(BeatFraction.Sixteenth))
+                music.playTone(587, music.beat(BeatFraction.Whole))
             } else {
-                basic.pause(music.beat(BeatFraction.Sixteenth))
+                basic.pause(music.beat(BeatFraction.Whole))
             }
-            basic.pause(200 - 8 * t)
+            basic.pause(250)
+            //basic.clearScreen()
+            led.plotAll()
+            //ToggleScreen()
+            basic.pause(250)
+            //ToggleScreen()
+
         }
-        basic.pause(250)
-        // Check if got top Scores
-        if (score < 6) {
-            for (let i0 = 0; i0 < 3; i0++) {
-                ToggleScreen()
-                basic.pause(250)
-                if (!(quiet)) {
-                    music.playTone(587, music.beat(BeatFraction.Whole))
-                } else {
-                    basic.pause(music.beat(BeatFraction.Whole))
-                }
-                ToggleScreen()
-                basic.pause(500)
+        screen += 1
+    }
+    else {
+        if (30 - score >= 5 * (level)) {
+            if (!(quiet)) {
+                music.playTone(587, music.beat(BeatFraction.Whole))
+            } else {
+                basic.pause(music.beat(BeatFraction.Whole))
             }
             screen += 1
+            basic.pause(1000)
         }
         else {
-            if (30 - score >= 5 * (level)) {
-                if (!(quiet)) {
-                    music.playTone(587, music.beat(BeatFraction.Whole))
-                } else {
-                    basic.pause(music.beat(BeatFraction.Whole))
-                }
-                screen += 1
-                basic.pause(1000)
-            }
-            else {
-                // 
-                ShowSadFace()
-                basic.pause(1000)
-            }
-            basic.pause(30)
+            // 
+            basic.clearScreen()
+            ShowSadFace()
+            basic.pause(1000)
         }
+        basic.pause(30)
     }
+
     basic.pause(1000)
 }
 function SelectScreen() {
@@ -380,6 +400,7 @@ function SelectScreen() {
         while (input.buttonIsPressed(Button.AB)) {
 
         }
+        basic.showString("Stage :")
         basic.showNumber(screen)
         while (!(input.buttonIsPressed(Button.AB))) {
             if (input.buttonIsPressed(Button.B)) {
@@ -395,16 +416,17 @@ function SelectScreen() {
             basic.pause(100)
         }
     }
-    basic.showString("S:" + screen)
+    //    basic.showString("S:" + screen)
 }
-// Select Level
+// Select Dificulty Level
 function SelectLevel() {
     // Select difficulty level (1-5)
     // default = 4
     if (input.buttonIsPressed(Button.AB)) {
         while (input.buttonIsPressed(Button.AB)) {
-
+            // Wait until keys are released
         }
+        basic.showString("Level :")
         basic.showNumber(level)
         while (!(input.buttonIsPressed(Button.AB))) {
             if (input.buttonIsPressed(Button.B)) {
@@ -422,10 +444,13 @@ function SelectLevel() {
             basic.pause(100)
         }
     }
-    basic.showString("L:" + level)
+    //    basic.showString("L:" + level)
 }
-// Prepare new game screen
+// Prepare new game stage
 function PrepareGame() {
+    SelectLevel()
+    basic.showString("S:" + screen)
+    PrepareChallenge()
     new_y = -1
     total_tries = 0
     in_game = true
@@ -435,12 +460,9 @@ function PrepareGame() {
     while (input.buttonIsPressed(Button.A) || input.buttonIsPressed(Button.B) || input.buttonIsPressed(Button.AB)) {
     }
 }
-level = 4
+level = 3
 PrepareOnStart()
 basic.forever(() => {
-    SelectScreen()
-    SelectLevel()
-    PrepareChallenge()
     PrepareGame()
     ExecuteGamescreen()
 })
